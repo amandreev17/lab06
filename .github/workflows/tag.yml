@@ -1,0 +1,33 @@
+name: CMake
+
+on:
+ push:
+   tags:
+     - 'v*.*.*.*'
+
+jobs: 
+
+  build:
+
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Configure Solver
+      run: cmake -B build
+    - name: Build Solver
+      run: cmake --build build
+    - name: Build package
+      run: cmake --build build --target package
+    - name: Build source package
+      run: cmake --build build --target package_source
+
+    - name: Make a release
+      uses: ncipollo/release-action@v1.14.0
+      with:
+        artifacts: "build/*.deb,build/*.rpm,build/*.tar.gz,build/*.zip"
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
